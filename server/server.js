@@ -3,13 +3,24 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is not set. Add it to your environment variables.');
+  process.exit(1);
+}
+
 const app = express();
 connectDB();
 
-app.use(cors({ origin: process.env.CLIENT_URL || '*' }));
+// CLIENT_URL may hold several comma-separated origins (no trailing slash needed)
+const allowedOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map((o) => o.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : '*' }));
 app.use(express.json());
 
 app.get('/', (req, res) => res.send('StaffSync API running'));
+app.get('/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime() })); // used by Render health checks
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes'));

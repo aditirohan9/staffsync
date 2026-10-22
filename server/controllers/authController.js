@@ -15,6 +15,9 @@ const userResponse = (user) => ({
   department: user.department,
   managerId: user.managerId,
   joiningDate: user.joiningDate,
+  phone: user.phone,
+  address: user.address,
+  bio: user.bio,
 });
 
 // POST /api/auth/register
@@ -70,4 +73,11 @@ exports.login = async (req, res) => {
 };
 
 // GET /api/auth/me
-exports.getMe = (req, res) => res.json({ user: req.user });
+exports.getMe = async (req, res) => {
+  try {
+    await req.user.populate('managerId', 'name email');
+    res.json({ user: req.user });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};

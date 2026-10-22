@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Email is required'],
-      unique: true,
       lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
@@ -23,15 +22,25 @@ const userSchema = new mongoose.Schema(
     department: { type: String, trim: true, index: true },
     managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     joiningDate: { type: Date, default: Date.now },
+    phone: {
+      type: String,
+      trim: true,
+      validate: { validator: (v) => !v || /^[0-9+\-\s()]{7,20}$/.test(v), message: 'Please provide a valid phone number' },
+    },
+    address: { type: String, trim: true, maxlength: [200, 'Address is too long (max 200 characters)'] },
+    bio: { type: String, trim: true, maxlength: [500, 'Bio is too long (max 500 characters)'] },
   },
   { timestamps: true }
 );
 
+// Unique index on email (fast login lookups + no duplicate accounts)
+userSchema.index({ email: 1 }, { unique: true });
+
 // Hash password whenever it is created or changed
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+// (async hook: no 'next' callback, which newer Mongoose versions no longer pass)
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 userSchema.methods.matchPassword = function (plain) {
