@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ email: 1 }, { unique: true });
 
 // Hash password whenever it is created or changed
+// (async hook: no 'next' callback, which newer Mongoose versions no longer pass)
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);

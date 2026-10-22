@@ -10,8 +10,9 @@ const Announcement = require('./models/Announcement');
 const Training = require('./models/Training');
 const Notification = require('./models/Notification');
 
-const PASSWORD = 'Password@123';
-const HR_PASSWORD = 'Admin@123';
+// Override for public deployments:  SEED_PASSWORD=... SEED_HR_PASSWORD=... npm run seed
+const PASSWORD = process.env.SEED_PASSWORD || 'Password@123';
+const HR_PASSWORD = process.env.SEED_HR_PASSWORD || 'Admin@123';
 
 const startOfDay = (d = new Date()) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
 const addDays = (n) => { const d = startOfDay(); d.setDate(d.getDate() + n); return d; };
@@ -109,7 +110,7 @@ async function main() {
   await Notification.insertMany(buildNotifications(users));
 
   console.log('\nSeed complete. Demo logins:');
-  console.log(`  HR        hr@staffsync.com        / ${HR_PASSWORD}`);
+  console.log(`  HR        hr@staffsync.com         / ${HR_PASSWORD}`);
   console.log(`  Manager   manager@staffsync.com    / ${PASSWORD}`);
   console.log(`  Employee  employee1@staffsync.com  / ${PASSWORD}`);
   console.log(`  Employee  employee2@staffsync.com  / ${PASSWORD}   (has not checked in today)`);
