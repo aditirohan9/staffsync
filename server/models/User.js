@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Email is required'],
-      unique: true,
       lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
@@ -34,11 +33,13 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Unique index on email (fast login lookups + no duplicate accounts)
+userSchema.index({ email: 1 }, { unique: true });
+
 // Hash password whenever it is created or changed
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 userSchema.methods.matchPassword = function (plain) {

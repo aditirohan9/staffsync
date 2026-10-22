@@ -11,7 +11,9 @@ const attendanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// One attendance record per user per day
-attendanceSchema.index({ userId: 1, date: 1 }, { unique: true });
+// One record per user per day; newest-first reads (history pages) use this index
+attendanceSchema.index({ userId: 1, date: -1 }, { unique: true });
+// Company-wide / team queries filtered by date
+attendanceSchema.index({ date: -1 });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);
