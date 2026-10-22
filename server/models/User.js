@@ -23,6 +23,13 @@ const userSchema = new mongoose.Schema(
     department: { type: String, trim: true, index: true },
     managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     joiningDate: { type: Date, default: Date.now },
+    phone: {
+      type: String,
+      trim: true,
+      validate: { validator: (v) => !v || /^[0-9+\-\s()]{7,20}$/.test(v), message: 'Please provide a valid phone number' },
+    },
+    address: { type: String, trim: true, maxlength: [200, 'Address is too long (max 200 characters)'] },
+    bio: { type: String, trim: true, maxlength: [500, 'Bio is too long (max 500 characters)'] },
   },
   { timestamps: true }
 );

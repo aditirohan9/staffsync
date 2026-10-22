@@ -54,8 +54,8 @@ exports.updateUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
     const allowed = isHR
-      ? ['name', 'email', 'designation', 'department', 'managerId', 'joiningDate', 'role', 'password']
-      : ['name', 'email', 'password'];
+      ? ['name', 'email', 'designation', 'department', 'managerId', 'joiningDate', 'role', 'password', 'phone', 'address', 'bio']
+      : ['name', 'email', 'password', 'phone', 'address', 'bio'];
 
     // Role change checks
     if (req.body.role !== undefined && req.body.role !== user.role) {
